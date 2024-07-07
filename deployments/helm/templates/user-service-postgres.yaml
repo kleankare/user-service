@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}-postgres-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}-postgres
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}-postgres
+    spec:
+      containers:
+        - name: {{ .Values.app.name }}-postgres
+          image: postgres
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.postgres.db }}
+            - name: POSTGRES_USER
+              value: {{ .Values.postgres.user }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.postgres.password }}
+            - name: TZ
+              value: {{ .Values.postgres.timezone }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.app.name }}-postgres-srv
+spec:
+  selector:
+    app: {{ .Values.app.name }}-postgres
+  ports:
+    - name: {{ .Values.app.name }}-postgres
+      protocol: TCP
+      port: {{ .Values.postgres.port }}
+      targetPort: {{ .Values.postgres.port }}

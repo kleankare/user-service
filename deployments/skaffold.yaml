@@ -1,0 +1,33 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: user-service
+build:
+  artifacts:
+    - image: user-service
+      context: ../
+      docker:
+        dockerfile: ./build/package/Dockerfile.dev
+      sync:
+        manual:
+          - src: '**/*'
+            dest: .
+deploy:
+  helm:
+    releases:
+      - name: helm
+        chartPath: ../deployments/helm
+        valuesFiles:
+          - ../deployments/helm/values.yaml
+        version: 0.1.0
+
+# manifests:
+#   rawYaml:
+#     - ./helm/templates/user-service.yaml
+#     - ./helm/templates/user-service-postgres.yaml
+#     - ./helm/templates/user-service-redis.yaml
+
+portForward:
+  - resourceType: deployment
+    resourceName: user-service-depl
+    port: 8080

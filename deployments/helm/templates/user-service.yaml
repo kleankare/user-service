@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      containers:
+        - name: {{ .Values.app.name }}
+          image: {{ .Values.app.name }}
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+          env:
+            - name: POSTGRES_HOST
+              value: {{ .Values.postgres.host }}
+            - name: POSTGRES_PORT
+              value: {{ .Values.postgres.port | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.postgres.db }}
+            - name: POSTGRES_USER
+              value: {{ .Values.postgres.user }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.postgres.password }}
+            - name: TZ
+              value: {{ .Values.postgres.tz }}
+            - name: REDIS_HOST
+              value: {{ .Values.redis.host }}
+            - name: REDIS_PORT
+              value: {{ .Values.redis.port | quote }}
+            - name: REDIS_PASSWORD
+              value: {{ .Values.redis.password }}
+          # volumeMounts:
+      #       - name: config-volume
+      #         mountPath: /app/.env.example
+      #         subPath: .env.example
+      # volumes:
+      #   - name: config-volume
+      #     configMap:
+      #       name: {{ .Values.app.name }}-config 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.app.name }}-srv
+spec:
+  selector:
+    app: {{ .Values.app.name }}
+  ports:
+    - name: {{ .Values.app.name }}
+      protocol: TCP
+      port: {{ .Values.app.port }}
+      targetPort: {{ .Values.app.port }}
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: {{ .Values.app.name }}-config
+# data:
+#   .env.example: |
+#     POSTGRES_HOST={{ .Values.postgres.host }}
+#     POSTGRES_PORT={{ .Values.postgres.port }}
+#     POSTGRES_DB={{ .Values.postgres.db }}
+#     POSTGRES_USER={{ .Values.postgres.user }}
+#     POSTGRES_PASSWORD={{ .Values.postgres.password }}
+#     TZ={{ .Values.postgres.tz }}
+#     REDIS_HOST={{ .Values.redis.host }}
+#     REDIS_PORT={{ .Values.redis.port }}
+#     REDIS_PASSWORD={{ .Values.redis.password }}
