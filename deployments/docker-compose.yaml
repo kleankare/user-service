@@ -9,6 +9,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 512Mi
+          cpus: "1"
+        reservations:
+          memory: 256Mi
+          cpus: "0.2"
   
   redis:
     image: redis:latest
@@ -24,6 +34,16 @@ services:
     volumes:
       - redis_data:/var/lib/redis/data
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 512Mi
+          cpus: "1"
+        reservations:
+          memory: 256Mi
+          cpus: "0.2"
 
   user-service:
     build:
@@ -40,6 +60,16 @@ services:
     depends_on:
       - postgres
       - redis
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 512Mi
+          cpus: "1"
+        reservations:
+          memory: 256Mi
+          cpus: "0.2"
 
 volumes:
   postgres_data:
