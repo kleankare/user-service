@@ -25,7 +25,7 @@ spec:
               cpu: "0.2"
           env:
             - name: POSTGRES_HOST
-              value: {{ .Values.postgres.host }}
+              value: {{ .Values.app.name }}-{{ .Values.postgres.service.name }}
             - name: POSTGRES_PORT
               value: {{ .Values.postgres.port | quote }}
             - name: POSTGRES_DB
@@ -37,7 +37,7 @@ spec:
             - name: TZ
               value: {{ .Values.postgres.tz }}
             - name: REDIS_HOST
-              value: {{ .Values.redis.host }}
+              value: {{ .Values.app.name }}-{{ .Values.redis.service.name }}
             - name: REDIS_PORT
               value: {{ .Values.redis.port | quote }}
             - name: REDIS_PASSWORD

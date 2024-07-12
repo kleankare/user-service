@@ -31,11 +31,18 @@ spec:
               value: {{ .Values.postgres.password }}
             - name: TZ
               value: {{ .Values.postgres.timezone }}
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.app.name }}-{{ .Values.postgres.storage.pvc_name }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.app.name }}-postgres-srv
+  name: {{ .Values.app.name }}-{{ .Values.postgres.service.name }}
 spec:
   selector:
     app: {{ .Values.app.name }}-postgres

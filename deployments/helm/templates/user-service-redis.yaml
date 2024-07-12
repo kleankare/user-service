@@ -31,7 +31,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.app.name }}-redis-srv
+  name: {{ .Values.app.name }}-{{ .Values.redis.service.name }}
 spec:
   selector:
     app: {{ .Values.app.name }}-redis
