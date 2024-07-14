@@ -31,6 +31,17 @@ spec:
               value: {{ .Values.postgres.password }}
             - name: TZ
               value: {{ .Values.postgres.timezone }}
+          readinessProbe:
+            successThreshold: 1
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U {{ .Values.postgres.user }} -d {{ .Values.postgres.db }} 
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data

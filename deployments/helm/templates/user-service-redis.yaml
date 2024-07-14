@@ -27,6 +27,17 @@ spec:
               value: {{ .Values.redis.password }}
           command: ["/bin/sh"]
           args: ["-c", "redis-server --requirepass '$(REDIS_PASSWORD)'"]
+          readinessProbe:
+            successThreshold: 1
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec redis-cli -a {{ .Values.redis.password }} --raw incr ping
 ---
 apiVersion: v1
 kind: Service

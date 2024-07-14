@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -47,6 +48,12 @@ func InitializaLogger() logger.LoggerFactory {
 
 func InitializeRoutes(db *gorm.DB, redisClient *redis.Client) *gin.Engine {
 	r := gin.Default()
+
+	r.GET("/healthz", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"status": "OK",
+		})
+	})
 
 	redisRepo := repositories.NewRedisRepository(redisClient)
 

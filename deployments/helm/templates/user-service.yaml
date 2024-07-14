@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: s{{ .Values.app.name }}-depl
+  name: {{ .Values.app.name }}-depl
 spec:
   replicas: 1
   selector:
@@ -23,6 +23,15 @@ spec:
             requests:
               memory: 256Mi
               cpu: "0.2"
+          livenessProbe:
+            successThreshold: 1
+            failureThreshold: 1
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 5
+            httpGet:
+              path: /healthz
+              port: {{ .Values.app.port }}
           env:
             - name: POSTGRES_HOST
               value: {{ .Values.app.name }}-{{ .Values.postgres.service.name }}
