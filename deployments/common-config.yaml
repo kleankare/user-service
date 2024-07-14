@@ -1,0 +1,14 @@
+services:
+  network-deploy-service:
+    networks:
+      - user-service
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 512m
+          cpus: "2"
+        reservations:
+          memory: 256m
+          cpus: "0.2"

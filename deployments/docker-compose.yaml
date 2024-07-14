@@ -9,18 +9,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
-    deploy:
-      mode: replicated
-      replicas: 1
-      resources:
-        limits:
-          memory: 512m
-          cpus: "1"
-        reservations:
-          memory: 256m
-          cpus: "0.2"
-    networks:
-     - user-service-network
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 10s
+    extends:
+      file: common-config.yaml
+      service: network-deploy-service
 
   redis:
     image: redis:latest
@@ -36,18 +33,15 @@ services:
     volumes:
       - redis_data:/var/lib/redis/data
     restart: unless-stopped
-    deploy:
-      mode: replicated
-      replicas: 1
-      resources:
-        limits:
-          memory: 512m
-          cpus: "1"
-        reservations:
-          memory: 256m
-          cpus: "0.2"
-    networks:
-     - user-service-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "--raw", "incr", "ping" ]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 10s
+    extends:
+      file: common-config.yaml
+      service: network-deploy-service
 
   user-service:
     build:
@@ -62,23 +56,16 @@ services:
       - ../:/app
     restart: unless-stopped
     depends_on:
-      - postgres
-      - redis
-    deploy:
-      mode: replicated
-      replicas: 1
-      resources:
-        limits:
-          memory: 512m
-          cpus: "1"
-        reservations:
-          memory: 256m
-          cpus: "0.2"
-    networks:
-     - user-service-network
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    extends:
+      file: common-config.yaml
+      service: network-deploy-service
 
 networks:
-  user-service-network:
+  user-service:
     driver: bridge
 
 volumes:
